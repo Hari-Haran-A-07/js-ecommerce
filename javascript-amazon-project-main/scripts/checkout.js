@@ -1,16 +1,6 @@
 const orderSummary = document.querySelector('.order-summary');
 const paymentSummary = document.querySelector('.payment-summary');
 
-const deliveryOptions = [
-  { id: '1', date: 'Tuesday, June 21', priceCents: 0 },
-  { id: '2', date: 'Wednesday, June 15', priceCents: 499 },
-  { id: '3', date: 'Monday, June 13', priceCents: 999 }
-];
-
-function getProduct(productId) {
-  return products.find((product) => product.id === productId);
-}
-
 function getDeliveryOption(deliveryOptionId) {
   return deliveryOptions.find((option) => option.id === deliveryOptionId)
     || deliveryOptions[0];
