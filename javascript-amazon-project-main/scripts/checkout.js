@@ -68,9 +68,8 @@ function renderOrderSummary() {
 
   document.querySelectorAll('.js-delete-item').forEach((button) => {
     button.addEventListener('click', () => {
-      const itemIndex = cart.findIndex((item) => item.productId === button.dataset.productId);
-      cart.splice(itemIndex, 1);
-      saveCart();
+      cartStore.remove(button.dataset.productId);
+      cart = cartStore.items;
       renderOrderSummary();
       renderPaymentSummary();
       updateCartHeader();
@@ -79,9 +78,8 @@ function renderOrderSummary() {
 
   document.querySelectorAll('.delivery-option-input').forEach((input) => {
     input.addEventListener('change', () => {
-      const item = cart.find((cartItem) => cartItem.productId === input.dataset.productId);
-      item.deliveryOptionId = input.value;
-      saveCart();
+      cartStore.setDeliveryOption(input.dataset.productId, input.value);
+      cart = cartStore.items;
       renderOrderSummary();
       renderPaymentSummary();
     });

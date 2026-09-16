@@ -42,19 +42,7 @@ function updateCartQuantity() {
 document.querySelectorAll('.j-add-to-cart').forEach((button) => {
   button.addEventListener('click', () => {
     const productId = button.dataset.productId;
-    const matchingItem = cart.find((item) => item.productId === productId);
-
-    if (matchingItem) {
-      matchingItem.quantity += 1;
-    } else {
-      cart.push({
-        productId,
-        quantity: 1,
-        deliveryOptionId: '1'
-      });
-    }
-
-    saveCart();
+    cartStore.add(productId);
     updateCartQuantity();
   });
 });
