@@ -8,9 +8,16 @@ try {
 	cart = [];
 }
 
+cart = cart.map((item) => ({
+	...item,
+	deliveryOptionId: item.deliveryOptionId || '1'
+}));
+
 function saveCart() {
 	localStorage.setItem(cartStorageKey, JSON.stringify(cart));
 }
+
+saveCart();
 
 function getCartQuantity() {
 	return cart.reduce((total, item) => total + item.quantity, 0);

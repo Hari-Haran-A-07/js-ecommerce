@@ -49,7 +49,8 @@ document.querySelectorAll('.j-add-to-cart').forEach((button) => {
     } else {
       cart.push({
         productId,
-        quantity: 1
+        quantity: 1,
+        deliveryOptionId: '1'
       });
     }
 

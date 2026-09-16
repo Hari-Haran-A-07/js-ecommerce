@@ -1,8 +1,19 @@
 const orderSummary = document.querySelector('.order-summary');
 const paymentSummary = document.querySelector('.payment-summary');
 
+const deliveryOptions = [
+  { id: '1', date: 'Tuesday, June 21', priceCents: 0 },
+  { id: '2', date: 'Wednesday, June 15', priceCents: 499 },
+  { id: '3', date: 'Monday, June 13', priceCents: 999 }
+];
+
 function getProduct(productId) {
   return products.find((product) => product.id === productId);
+}
+
+function getDeliveryOption(deliveryOptionId) {
+  return deliveryOptions.find((option) => option.id === deliveryOptionId)
+    || deliveryOptions[0];
 }
 
 function updateCartHeader() {
@@ -22,10 +33,11 @@ function renderOrderSummary() {
 
   orderSummary.innerHTML = cart.map((item, index) => {
     const product = getProduct(item.productId);
+    const selectedDeliveryOption = getDeliveryOption(item.deliveryOptionId);
 
     return `
       <div class="cart-item-container">
-        <div class="delivery-date">Delivery date: Tuesday, June 21</div>
+        <div class="delivery-date">Delivery date: ${selectedDeliveryOption.date}</div>
         <div class="cart-item-details-grid">
           <img class="product-image" src="${product.image}">
           <div class="cart-item-details">
@@ -39,22 +51,16 @@ function renderOrderSummary() {
           </div>
           <div class="delivery-options">
             <div class="delivery-options-title">Choose a delivery option:</div>
-            <div class="delivery-option">
-              <input type="radio" checked class="delivery-option-input"
-                name="delivery-option-${index}">
-              <div>
-                <div class="delivery-option-date">Tuesday, June 21</div>
-                <div class="delivery-option-price">FREE Shipping</div>
-              </div>
-            </div>
-            <div class="delivery-option">
-              <input type="radio" class="delivery-option-input"
-                name="delivery-option-${index}">
-              <div>
-                <div class="delivery-option-date">Wednesday, June 15</div>
-                <div class="delivery-option-price">$4.99 - Shipping</div>
-              </div>
-            </div>
+            ${deliveryOptions.map((option) => `
+              <label class="delivery-option">
+                <input type="radio" class="delivery-option-input"
+                  name="delivery-option-${index}" value="${option.id}"
+                  data-product-id="${product.id}"${option.id === selectedDeliveryOption.id ? ' checked' : ''}>
+                <div>
+                  <div class="delivery-option-date">${option.date}</div>
+                  <div class="delivery-option-price">${option.priceCents === 0 ? 'FREE' : `$${(option.priceCents / 100).toFixed(2)}`} - Shipping</div>
+                </div>
+              </label>`).join('')}
           </div>
         </div>
       </div>`;
@@ -70,6 +76,16 @@ function renderOrderSummary() {
       updateCartHeader();
     });
   });
+
+  document.querySelectorAll('.delivery-option-input').forEach((input) => {
+    input.addEventListener('change', () => {
+      const item = cart.find((cartItem) => cartItem.productId === input.dataset.productId);
+      item.deliveryOptionId = input.value;
+      saveCart();
+      renderOrderSummary();
+      renderPaymentSummary();
+    });
+  });
 }
 
 function renderPaymentSummary() {
@@ -78,7 +94,10 @@ function renderPaymentSummary() {
     const product = getProduct(item.productId);
     return total + product.priceCents * item.quantity;
   }, 0);
-  const shippingCents = itemCount > 0 ? 499 : 0;
+  const shippingCents = cart.reduce((total, item) => {
+    const deliveryOption = getDeliveryOption(item.deliveryOptionId);
+    return total + deliveryOption.priceCents * item.quantity;
+  }, 0);
   const subtotalCents = itemTotal + shippingCents;
   const taxCents = Math.round(subtotalCents * 0.1);
   const totalCents = subtotalCents + taxCents;
